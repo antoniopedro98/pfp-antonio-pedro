@@ -29,6 +29,7 @@ class BootstrappingUtils:
         for _ in range(self.replacements):
             if question_type == 'single':
                 population = self.single_option_sampling()
+                
             elif question_type == 'multiple':
                 population = self.multiple_option_sampling()
             
@@ -38,16 +39,19 @@ class BootstrappingUtils:
         population_metrics = {option: 
             {
                 'population': [],
-                'confidence': 0 
+                'confidence': ()
             } for option in self.options
         }
+        
+        # add population mean total answers
         for population in populations:
             for option in population:
-                # add population answers
                 population_metrics[option]['population'].append( (population[option] / self.population_size) * 100 )
-            # compute confidence
-            population_metrics[option]['confidence'] = self.confidence_interval(data_points=population_metrics[option]['population'])
-        
+
+        # compute confidence
+        for option in population_metrics:
+            population_metrics[option]['confidence'] = self.confidence_interval(population_metrics[option]['population'])
+
         return population_metrics
 
 
@@ -126,7 +130,7 @@ class BootstrappingUtils:
         return population_answers
 
 
-    def confidence_interval(*, data_points: list, confidence: float = 0.95) -> tuple:
+    def confidence_interval(self, data_points: list, confidence: float = 0.95) -> tuple:
         """
             Compute the confidence interval for the population answers.
 
