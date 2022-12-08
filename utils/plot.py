@@ -28,7 +28,7 @@ class PlotUtils:
         """
             Draw barplots with single bars.
         """
-        barplot = sns.catplot(data=self.df, kind="bar", x=x_axis, y=y_axis, ci="sd", 
+        barplot = sns.catplot(data=self.df, kind="bar", x=x_axis, y=y_axis, errorbar="sd", 
                               palette="dark", alpha=.5, linewidth=5,
                               height=5, aspect=10/5).set(title=title)
         

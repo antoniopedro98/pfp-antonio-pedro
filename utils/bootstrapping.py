@@ -14,11 +14,12 @@ from statistics import mean, pstdev
 
 
 class BootstrappingUtils:    
-    def __init__(self, answers: list[any], options: list[str], replacements: int = 1000, population_size: int = 1000):
+    def __init__(self, answers: list[any], options: list[str], replacements: int = 1000, population_size: int = 1000, confidence: float = 0.95):
         self.answers = answers
         self.options = options
         self.replacements = replacements
         self.population_size = population_size
+        self.confidence = confidence
 
 
     def bootstrapping(self, question_type: str = 'single') -> dict:
@@ -62,7 +63,7 @@ class BootstrappingUtils:
             like 'What is your age?', 'What percentage...'.
         """
         population = self.numerical_field_sampling()
-        confidence = self.confidence_interval(data_points=population)
+        confidence = self.confidence_interval(population)
 
         population_metric = {
             'population': population,
@@ -131,7 +132,7 @@ class BootstrappingUtils:
         return population_answers
 
 
-    def confidence_interval(self, data_points: list, confidence: float = 0.95) -> tuple:
+    def confidence_interval(self, data_points: list) -> tuple:
         """
             Compute the confidence interval for the population answers.
 
@@ -150,7 +151,7 @@ class BootstrappingUtils:
         # margin error
         margin_error = standard_error * 2
         
-        lower_value = X - (confidence * (S / sr_n))
-        upper_value = X + (confidence * (S / sr_n))
+        lower_value = X - (self.confidence * (S / sr_n))
+        upper_value = X + (self.confidence * (S / sr_n))
         
         return (lower_value, X, upper_value)

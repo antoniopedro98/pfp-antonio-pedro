@@ -20,6 +20,7 @@ class DataframeUtils:
         self.df = self.get_df(df_path, sep)
         self.format_df()
       
+
     def list_columns(self):
         """
             List columns from dataframe with two auxiliar identifiers
