@@ -6,8 +6,9 @@ of some basic plots, such as Barplot, Boxplot
 Likert and Wordcloud.
 
 Author: Antonio Pedro Santos Alves
-Reviewer: Marcos Kalinowski
+Advisor: Marcos Kalinowski
 """
+
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt

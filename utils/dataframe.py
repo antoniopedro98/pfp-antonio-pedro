@@ -6,7 +6,7 @@ that sometimes imply in some extra cells, lines of codes
 and google searches. 
 
 Author: Antonio Pedro Santos Alves
-Reviewer: Marcos Kalinowski
+Advisor: Marcos Kalinowski
 """
 
 import pandas as pd
@@ -14,12 +14,12 @@ from statistics import mean, median
 
 
 class DataframeUtils:    
-    def __init__(self, df_path: str, to_discard_columns_file: str, to_format_columns_file: str):
+    def __init__(self, df_path: str, sep: str, to_discard_columns_file: str, to_format_columns_file: str):
         self.to_discard_columns_file = to_discard_columns_file
         self.to_format_columns_file = to_format_columns_file
-        self.df = self.get_df(df_path)
-    
-    
+        self.df = self.get_df(df_path, sep)
+        self.format_df()
+      
     def list_columns(self):
         """
             List columns from dataframe with two auxiliar identifiers
@@ -37,13 +37,20 @@ class DataframeUtils:
         """
         self.df = self.df.drop(columns=columns)
 
-    
+
     def remove_rows_by_index(self, indexes: list[int]):
         """
             Remove some rows from dataframe according to 'indexes' 
             and update it.
         """
         self.df = self.df.drop(indexes)
+
+
+    def remove_value_from_df(self, value: str, column: str):
+        """
+            Remove all rows that contains a specific value in one column
+        """
+        self.df.drop( self.df.loc[ self.df[column] == value].index, inplace=True ) 
 
 
     def replace_value_by_condition(self, column: str, old_value: any, new_value: any, condition: str):
@@ -75,13 +82,6 @@ class DataframeUtils:
         else:
             self.df = self.df
 
-    
-    def remove_value_from_df(self, value: str, column: str):
-        """
-            Remove all rows that contains a specific value in one column
-        """
-        self.df.drop( self.df.loc[ self.df[column] == value].index, inplace=True ) 
-        
 
     def replace_list_values_by_condition(self, column: str, old_values: list[any], new_value: any, condition: str):
         """
@@ -95,7 +95,7 @@ class DataframeUtils:
             self.replace_value_by_condition(column, value, new_value, condition)
 
 
-    def format_df(self, df: pd.DataFrame) -> pd.DataFrame:
+    def format_df(self):
         """
             Format dataframe columns discarding those which are specified
             in 'discard_columns_path' and setting the column name of
@@ -112,11 +112,11 @@ class DataframeUtils:
 
         # remove '\n' character
         unused_columns = [unused_column.replace("\n", '') for unused_column in unused_columns]
-    
-        df = self.remove_columns(df, unused_columns)
+
+        self.remove_columns(unused_columns)
 
         # remove the first two rows - unnecessary data describing the columns
-        df = self.remove_rows_by_index(df, [0, 1])
+        self.remove_rows_by_index([0, 1])
 
         with open(self.to_format_columns_file, encoding="utf-8") as file_formatted_columns:
             formatted_columns = file_formatted_columns.readlines()
@@ -124,16 +124,13 @@ class DataframeUtils:
         # remove '\n' character
         formatted_columns = [formatted_column.replace("\n", '') for formatted_column in formatted_columns]
         
-        df.columns = formatted_columns
-
-        return df
+        self.df.columns = formatted_columns
 
 
-    def get_df(self, df_path: str) -> pd.DataFrame:
+    def get_df(self, df_path: str, sep: str) -> pd.DataFrame:
         """
             Read dataframe and format it according to some external files
         """
-        df = pd.read_csv(df_path, sep=";")
-        df = self.format_df(df)
+        df = pd.read_csv(df_path, sep=sep)
 
         return df

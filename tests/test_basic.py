@@ -1,5 +1,4 @@
 import unittest
-
 from utils.basic import rename_values, format_wordcloud_text
 
 class TestBasic(unittest.TestCase):
@@ -60,10 +59,6 @@ class TestBasic(unittest.TestCase):
             In this case, words like 'Human Resources' are counted
             as 'Human Resources', together.
         """
-        list_words = ['Human Resources', 'Human', 'Resources']
+        list_words = ['Human Resources', 'Human', 'Resources', 'Human']
         self.assertEqual(format_wordcloud_text(texts=list_words, use_sep=False),
-         {'Human Resources': 1, 'Human': 1, 'Resources': 1})
-
-
-if __name__ == '__main__':
-    unittest.main()
+         {'Human Resources': 1, 'Human': 2, 'Resources': 1})

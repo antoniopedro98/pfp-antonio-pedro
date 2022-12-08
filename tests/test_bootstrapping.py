@@ -1,5 +1,4 @@
 import unittest
-
 from utils.bootstrapping import BootstrappingUtils
 
 class TestBootstrapping(unittest.TestCase):
@@ -42,9 +41,3 @@ class TestBootstrapping(unittest.TestCase):
         test_population_metric = {'population': [10, 10, 10], 'confidence': (10.0, 10.0, 10.0)}
 
         self.assertEqual(test_bootstrapping_utils.bootstrapping_numerical_fields(), test_population_metric)
-
-    
-
-
-if __name__ == '__main__':
-    unittest.main()

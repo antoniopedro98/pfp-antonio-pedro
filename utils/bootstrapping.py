@@ -5,8 +5,9 @@ This module aims to center the process
 and computation of bootstrapping.
 
 Author: Antonio Pedro Santos Alves
-Reviewer: Marcos Kalinowski
+Advisor: Marcos Kalinowski
 """
+
 import random
 import math
 from statistics import mean, pstdev

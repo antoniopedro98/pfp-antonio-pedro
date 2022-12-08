@@ -4,7 +4,7 @@ Utilities functions.
 This module aims to concentrate some utilities functions.
 
 Author: Antonio Pedro Santos Alves
-Reviewer: Marcos Kalinowski
+Advisor: Marcos Kalinowski
 """
 
 def rename_values(*, rename_mapping: dict, values: list[any], not_found_value: str = '') -> list[any]:
