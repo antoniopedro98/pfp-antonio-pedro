@@ -108,7 +108,7 @@ class PlotUtils:
         sns.heatmap(pivot_df, annot=True, fmt=fmt, linewidths=.5).set(title=title)
 
 
-    def pie_chart(self, values_column: str, labels_columns: str, title: str = ""):
+    def pie_chart(self, values_column: str, labels_column: str, title: str = ""):
         """
             Draw a piechart from a dataframe containing labels 
             and the percentage of each label.
@@ -116,7 +116,7 @@ class PlotUtils:
         
         #'values' contains percentages of pie - sum must not exceed 100
         values = list(self.df[values_column])
-        labels = list(self.df[labels_columns])
+        labels = list(self.df[labels_column])
 
         #define Seaborn color palette to use
         colors = sns.color_palette('pastel')[0:len(values)]
