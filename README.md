@@ -37,4 +37,4 @@ Unit Tests with Coverage Report:
 
 If you wish to install new libraries, you just need to install them on your virtual environment and not on your system environment. In other words, to install new libraries in this project, just type:
 
-- pipenv install <library-name>
+- pipenv install '<library-name>'
