@@ -10,11 +10,12 @@ Advisor: Marcos Kalinowski
 
 import random
 import math
-from statistics import mean, pstdev
+import numpy as np
+from scipy.stats import t
 
 
 class BootstrappingUtils:    
-    def __init__(self, answers: list[any], options: list[str], replacements: int = 1000, population_size: int = 1000, confidence: float = 0.95):
+    def __init__(self, answers: list[any], options: list[str], replacements: int = 1000, population_size: int = 1000, confidence: float = 95):
         self.answers = answers
         self.options = options
         self.replacements = replacements
@@ -28,7 +29,7 @@ class BootstrappingUtils:
            like both single and multiple choice.
         """
         populations = []
-        for _ in range(self.replacements):
+        for _ in range(self.population_size):
             if question_type == 'single':
                 population = self.single_option_sampling()
                 
@@ -83,7 +84,7 @@ class BootstrappingUtils:
         # ensure that all options will be filled - with 0 at least
         population_answers = {option: 0 for option in self.options}
         
-        for _ in range(self.population_size):
+        for _ in range(self.replacements):
             rand_idx = random.randrange(len(self.answers))
             random_option = self.answers[rand_idx]
             population_answers[random_option] += 1
@@ -103,7 +104,7 @@ class BootstrappingUtils:
         # ensure that all options will be filled - with 0 at least
         population_answers = {option: 0 for option in self.options}
         
-        for _ in range(self.population_size):
+        for _ in range(self.replacements):
             rand_idx = random.randrange(len(self.answers))
             random_option_list = self.answers[rand_idx]
             # increase option total of answers for each one assigned
@@ -138,20 +139,21 @@ class BootstrappingUtils:
 
             Based on https://www.indeed.com/career-advice/career-development/how-to-calculate-confidence-interval
         """
-        # mean
-        X = mean(data_points)
-        # population standard deviation
-        S = pstdev(data_points)
+        
+        # sampling mean
+        X = np.mean(data_points)
+
+        # sampling standard deviation
+        S = np.std(data_points, ddof=1)
+
         # data points length
         n = len(data_points)
-        # square root data_points length
-        sr_n = math.sqrt(n)
-        # standard error
-        standard_error = S / n
-        # margin error
-        margin_error = standard_error * 2
-        
-        lower_value = X - (self.confidence * (S / sr_n))
-        upper_value = X + (self.confidence * (S / sr_n))
+
+        # critical value t-Student distribution
+        critical_value_t = t.ppf((1 + self.confidence/100) / 2, n - 1)
+
+        # confidence interval
+        lower_value = X - critical_value_t * S / np.sqrt(n)
+        upper_value = X + critical_value_t * S / np.sqrt(n)
         
         return (lower_value, X, upper_value)

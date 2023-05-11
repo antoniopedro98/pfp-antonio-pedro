@@ -24,20 +24,32 @@ class PlotUtils:
         sns.set(rc={'figure.figsize':(13.7,13.27)})
 
 
-    def single_barplot(self, x_axis: str, y_axis: str, title: str = '', x_label: str = '', y_label: str = '', x_label_rotation: int = 0):
+    def single_barplot(self, x_axis, y_axis, title='', x_label='', y_label='', x_label_rotation=0, color='', total_answers='', bar_orientation='horizontal'):
         """
             Draw barplots with single bars.
         """
-        barplot = sns.catplot(data=self.df, kind="bar", x=x_axis, y=y_axis, errorbar="sd", 
-                              palette="dark", alpha=.5, linewidth=5,
-                              height=5, aspect=10/5).set(title=title)
+        if color:
+            barplot = sns.catplot(data=self.df, kind="bar", x=x_axis, y=y_axis, color=color, alpha=.5, linewidth=5,
+                                  height=5, aspect=10/5).set(title=title)
+
+        # use a random list of colors
+        else:
+            barplot = sns.catplot(data=self.df, kind="bar", x=x_axis, y=y_axis, ci="sd", palette="dark", alpha=.5, linewidth=5,
+                                  height=5, aspect=10/5).set(title=title)
+
         
         barplot.set_xticklabels(rotation=x_label_rotation)
         barplot.despine(left=True)
         barplot.set_axis_labels(x_label, y_label)
+        x_axis = barplot.ax.get_xlim()
+        y_axis = barplot.ax.get_ylim()
+        if bar_orientation == 'horizontal':
+            barplot.ax.text((x_axis[1] - x_axis[1] * 0.2), (y_axis[0] - y_axis[0] * 0.1), total_answers)
+        elif bar_orientation == 'vertical':
+            barplot.ax.text((x_axis[1] - x_axis[1] * 0.2), (y_axis[1] - y_axis[1] * 0.1), total_answers)
 
 
-    def single_boxplot(self, y_axis: str, outliers: bool = True, title: str = ''):
+    def single_boxplot(self, y_axis: str, outliers: bool = True, title: str = '', total_answers: str =''):
         """
             Draw a boxplot over one dimension (y-axis)
         """
@@ -54,6 +66,11 @@ class PlotUtils:
                         size='x-small', color='w', weight='semibold')
 
         boxplot.set(title=title)
+        
+        x_axis = boxplot.get_xlim()
+        y_axis = boxplot.get_ylim()
+
+        boxplot.text((x_axis[1] - x_axis[1] * 0.25), (y_axis[1] - y_axis[1] * 0.1), total_answers)
 
 
     def multi_boxplot(self, x_axis: str, y_axis: str, outliers: bool = True, title: str = ''):
@@ -108,7 +125,7 @@ class PlotUtils:
         sns.heatmap(pivot_df, annot=True, fmt=fmt, linewidths=.5).set(title=title)
 
 
-    def pie_chart(self, values_column: str, labels_column: str, title: str = ""):
+    def pie_chart(self, values_column: str, labels_column: str, title: str = "", total_answers: str = ''):
         """
             Draw a piechart from a dataframe containing labels 
             and the percentage of each label.
@@ -124,7 +141,12 @@ class PlotUtils:
         #create pie chart with matplotlib but use seaborn default color pallete
         plt.pie(values, labels=labels, colors=colors, autopct='%.0f%%')
         plt.title(title)
+        
+        x_axis_min, x_axis_max, y_axis_min, y_axis_max = plt.axis()
+        plt.text((x_axis_max), (y_axis_min + y_axis_min * 0.05), total_answers)
+
         plt.show()
+        
 
 
     def wordcloud(self, word_column: str, count_column: str):
