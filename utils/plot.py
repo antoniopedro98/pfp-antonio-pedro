@@ -34,7 +34,7 @@ class PlotUtils:
 
         # use a random list of colors
         else:
-            barplot = sns.catplot(data=self.df, kind="bar", x=x_axis, y=y_axis, ci="sd", palette="dark", alpha=.5, linewidth=5,
+            barplot = sns.catplot(data=self.df, kind="bar", x=x_axis, y=y_axis, ci="boot", palette="dark", alpha=.5, linewidth=5,
                                   height=5, aspect=10/5).set(title=title)
 
         

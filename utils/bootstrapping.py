@@ -23,21 +23,22 @@ class BootstrappingUtils:
         self.confidence = confidence
 
 
-    def bootstrapping(self, question_type: str = 'single') -> dict:
+    def bootstrapping(self, question_type: str):
         """
            Create bootstrapping for 'to-choose-options' questions,
            like both single and multiple choice.
         """
+
         populations = []
         for _ in range(self.population_size):
             if question_type == 'single':
                 population = self.single_option_sampling()
-                
+
             elif question_type == 'multiple':
                 population = self.multiple_option_sampling()
-            
+
             populations.append(population)
-        
+
         # compute the percentage of answers in each option for each population/replacement
         population_metrics = {option: 
             {
@@ -45,11 +46,11 @@ class BootstrappingUtils:
                 'confidence': ()
             } for option in self.options
         }
-        
+
         # add population mean total answers
         for population in populations:
             for option in population:
-                population_metrics[option]['population'].append( (population[option] / self.population_size) * 100 )
+                population_metrics[option]['population'].append(population[option])
 
         # compute confidence
         for option in population_metrics:
@@ -58,7 +59,7 @@ class BootstrappingUtils:
         return population_metrics
 
 
-    def bootstrapping_numerical_fields(self) -> dict:
+    def bootstrapping_numerical_fields(self):
         """
             Create bootstrapping for 'set-numerical-value' questions,
             like 'What is your age?', 'What percentage...'.
@@ -70,29 +71,33 @@ class BootstrappingUtils:
             'population': population,
             'confidence': confidence
         }
-        
+
         return population_metric
         
 
-    def single_option_sampling(self) -> dict:
+    def single_option_sampling(self):
         """
             Execute a sampling of answers a 'population_size' times 
             given a previous set of real answers.
 
             In this case, each answer represents one single option.
         """
+        
         # ensure that all options will be filled - with 0 at least
         population_answers = {option: 0 for option in self.options}
-        
+
         for _ in range(self.replacements):
             rand_idx = random.randrange(len(self.answers))
             random_option = self.answers[rand_idx]
             population_answers[random_option] += 1
             
+        for option in population_answers:
+            population_answers[option] = population_answers[option] / self.replacements
+
         return population_answers
 
 
-    def multiple_option_sampling(self) -> dict:
+    def multiple_option_sampling(self):
         """
             Execute a sampling of answers a 'population_size' times 
             given a previous set of real answers.
@@ -101,20 +106,27 @@ class BootstrappingUtils:
             valid options, once we are dealing with multiple 
             option question
         """
+        
         # ensure that all options will be filled - with 0 at least
         population_answers = {option: 0 for option in self.options}
-        
+
         for _ in range(self.replacements):
-            rand_idx = random.randrange(len(self.answers))
-            random_option_list = self.answers[rand_idx]
+            random_option_list = []
+            while not random_option_list:
+                rand_idx = random.randrange(len(self.answers))
+                random_option_list = self.answers[rand_idx]
+
             # increase option total of answers for each one assigned
             for random_option in random_option_list:
                 population_answers[random_option] += 1
-        
+
+        for option in population_answers:
+            population_answers[option] = population_answers[option] / self.replacements
+
         return population_answers
 
 
-    def numerical_field_sampling(self) -> list:
+    def numerical_field_sampling(self):
         """
             Execute a sampling of answers a 'population_size' times
             given a previous set of answered value.
@@ -122,38 +134,35 @@ class BootstrappingUtils:
             In this case, each answer was a numerical value set.
             We choose one that already exists.
         """
-        population_answers = []
         
+        population_answers = []
+
         for _ in range(self.population_size):
             # only choose one value inside of what people have chosen
             rand_idx = random.randrange(len(self.answers))
             random_option = self.answers[rand_idx]
             population_answers.append(random_option)
-            
+
         return population_answers
 
 
-    def confidence_interval(self, data_points: list) -> tuple:
+    def confidence_interval(self, data_points):
         """
             Compute the confidence interval for the population answers.
 
             Based on https://www.indeed.com/career-advice/career-development/how-to-calculate-confidence-interval
         """
-        
+
         # sampling mean
-        X = np.mean(data_points)
+        m = np.mean(data_points)
+        # standard deviation
+        s = np.std(data_points) 
+        dof = len(data_points) - 1 
+        # t-Student distribution
+        t_crit = np.abs(t.ppf( (1 - (self.confidence / 100) ) / 2, dof))
 
-        # sampling standard deviation
-        S = np.std(data_points, ddof=1)
+        # https://towardsdatascience.com/how-to-calculate-confidence-intervals-in-python-a8625a48e62b
+        lower_value = m - s * t_crit / np.sqrt(len(data_points))
+        upper_value = m + s * t_crit / np.sqrt(len(data_points))
 
-        # data points length
-        n = len(data_points)
-
-        # critical value t-Student distribution
-        critical_value_t = t.ppf((1 + self.confidence/100) / 2, n - 1)
-
-        # confidence interval
-        lower_value = X - critical_value_t * S / np.sqrt(n)
-        upper_value = X + critical_value_t * S / np.sqrt(n)
-        
-        return (lower_value, X, upper_value)
+        return (lower_value, m, upper_value)
