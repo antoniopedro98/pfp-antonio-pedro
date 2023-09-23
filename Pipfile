@@ -15,6 +15,7 @@ ipynb = "*"
 plot-likert = "*"
 wordcloud = "*"
 coverage = "*"
+squarify = "*"
 
 [dev-packages]
 
