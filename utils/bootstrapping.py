@@ -64,15 +64,19 @@ class BootstrappingUtils:
             Create bootstrapping for 'set-numerical-value' questions,
             like 'What is your age?', 'What percentage...'.
         """
-        population = self.numerical_field_sampling()
-        confidence = self.confidence_interval(population)
+        populations = []
+        for _ in range(self.population_size):
+            # get the mean of numerical values informed
+            population_mean = self.numerical_field_sampling()
+            populations.append(population_mean)
 
-        population_metric = {
-            'population': population,
-            'confidence': confidence
+        # compute the percentage of answers for each population
+        population_metrics = {
+            'population': populations,
+            'confidence': self.confidence_interval(populations) # confidence interval for a list of population means
         }
 
-        return population_metric
+        return population_metrics
         
 
     def single_option_sampling(self):
@@ -137,13 +141,13 @@ class BootstrappingUtils:
         
         population_answers = []
 
-        for _ in range(self.population_size):
+        for _ in range(self.replacements):
             # only choose one value inside of what people have chosen
             rand_idx = random.randrange(len(self.answers))
             random_option = self.answers[rand_idx]
             population_answers.append(random_option)
 
-        return population_answers
+        return sum(population_answers) / self.replacements
 
 
     def confidence_interval(self, data_points):
