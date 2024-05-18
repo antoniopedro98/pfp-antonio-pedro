@@ -16,6 +16,7 @@ plot-likert = "*"
 wordcloud = "*"
 coverage = "*"
 squarify = "*"
+openpyxl = "*"
 
 [dev-packages]
 
